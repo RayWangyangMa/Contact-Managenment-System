@@ -1,6 +1,4 @@
 # Contact-Managenment-System
- 
-# Contact Management System
 
 This Contact Management System is a Python project which uses tkinter for the GUI and JSON for storing contact data. This application allows you to manage your contacts conveniently on your local system.
 
