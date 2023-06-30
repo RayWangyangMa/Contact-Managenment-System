@@ -1,30 +1,30 @@
-# Contact-Managenment-System
+# Contact Management System
 
-This Contact Management System is a Python project which uses tkinter for the GUI and JSON for storing contact data. This application allows you to manage your contacts conveniently on your local system.
+This Contact Management System is a Python-based application designed with PyQt6 for a seamless user interface and JSON for robust, local data storage. Manage your contacts with efficiency and ease directly on your local system.
 
 ## Features
 
-1. **Add Contact:** Allows you to add a new contact with fields like Name, Phone Number, Email and Group.
+1. **Add Contact:** Permits you to create a new contact with details such as Name, Phone Number, and Email.
 
-2. **View Contact:** Allows you to view the details of an existing contact.
+2. **View Contact:** Lets you browse the details of an existing contact.
 
-3. **Search Contacts:** Allows you to search for a contact using any keyword present in any of the fields (Name, Phone, Email, Group).
+3. **Edit Contact:** Allows you to modify the details of an existing contact.
 
-4. **Edit Contact:** Allows you to edit the details of an existing contact.
+4. **Delete Contact:** Provides an option to delete an existing contact from the system.
 
-5. **Delete Contact:** Allows you to delete an existing contact.
+All contact information is stored locally in a `contacts.json` file, which ensures that your data remains safe, secure, and easily accessible.
 
-6. **Show File Path:** Shows the location of the `contact.json` file which stores all the contact information.
+## Installation & Usage
 
-## Usage
-
-To use this application, clone this repository to your local machine. Ensure you have Python and tkinter installed. Navigate to the repository's directory and run the Python file:
+First, clone this repository to your local machine. Ensure you have Python and PyQt6 installed. Then, navigate to the repository's directory in your terminal or command line interface and run the Python file:
 
 ```bash
-python ContactSystem.py
+python ContactManagementSystem.py
+
 ```
-This will open up the GUI of the Contact Management System where you can perform various operations related to your contacts.
+
+This command will open up the GUI of the Contact Management System, where you can perform various operations related to your contacts.
 
 ## Contributions
 
-Feel free to fork this project, to contribute and make this project better. Pull requests are always welcome.
+We welcome contributions that can enhance this project further. Feel free to fork this project, submit changes, and create a pull request. We appreciate your efforts to make this project better.
