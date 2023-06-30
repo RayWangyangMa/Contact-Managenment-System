@@ -1,26 +1,17 @@
-import tkinter as tk
-from tkinter import messagebox
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget, QMessageBox, QFormLayout, QDialog, QDialogButtonBox
+from PyQt6.QtGui import QFont, QIcon, QPalette, QColor
+from PyQt6.QtCore import Qt
 import json
 import os
 
 
-class Contact:
-    def __init__(self, name, phone, email, group):
-        self.name = name.lower()
-        self.phone = phone
-        self.email = email
-        self.group = group
-
-
 class AddressBook:
     def __init__(self, filename='contacts.json'):
-        # The filename is joined with the directory path of this script
-        self.filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), filename)
-
+        self.filename = os.path.join(os.path.dirname(__file__), filename)
         if not os.path.exists(self.filename):
             with open(self.filename, 'w') as file:
                 json.dump({}, file)
-
         with open(self.filename, 'r') as file:
             self._contacts = json.load(file)
 
@@ -28,14 +19,14 @@ class AddressBook:
         with open(self.filename, 'w') as file:
             json.dump(self._contacts, file)
 
-    def add(self, name, phone, email, group):
+
+    def add(self, name, phone, email):
         name = name.lower()
         if name not in self._contacts:
             self._contacts[name] = {
                 'name': name,
                 'phone': phone,
                 'email': email,
-                'group': group
             }
             self.save_contacts()
             return True
@@ -46,6 +37,19 @@ class AddressBook:
         name = name.lower()
         return self._contacts.get(name, None)
 
+    def edit(self, name, phone, email):
+        name = name.lower()
+        if name in self._contacts:
+            self._contacts[name] = {
+                'name': name,
+                'phone': phone,
+                'email': email,
+            }
+            self.save_contacts()
+            return True
+        else:
+            return False
+
     def delete(self, name):
         name = name.lower()
         if name in self._contacts:
@@ -55,154 +59,153 @@ class AddressBook:
         else:
             return False
 
-    def view_all(self, group=None):
-        if group:
-            group = group.lower()
-            return {k: v for k, v in self._contacts.items() if v['group'] == group}
-        else:
-            return self._contacts
+
+class ContactDialog(QDialog):
+    def __init__(self, parent=None, name='', phone='', email=''):
+        super().__init__(parent)
+
+        self.setWindowTitle("Contact Details")
+
+        self.layout = QFormLayout(self)
+
+        self.name_entry = QLineEdit()
+        self.name_entry.setText(name)
+        self.layout.addRow(QLabel("Name"), self.name_entry)
+
+        self.phone_entry = QLineEdit()
+        self.phone_entry.setText(phone)
+        self.layout.addRow(QLabel("Phone"), self.phone_entry)
+
+        self.email_entry = QLineEdit()
+        self.email_entry.setText(email)
+        self.layout.addRow(QLabel("Email"), self.email_entry)
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+
+        self.layout.addWidget(self.buttons)
+
+    def get_values(self):
+        return self.name_entry.text(), self.phone_entry.text(), self.email_entry.text()
 
 
-    def edit(self, name, phone, email, group):
-        name = name.lower()
-        if name in self._contacts:
-            self._contacts[name] = {
-                'name': name,
-                'phone': phone,
-                'email': email,
-                'group': group
-            }
-            self.save_contacts()
-            return True
-        else:
-            return False
-
-    def search(self, term):
-        term = term.lower()
-        return {k: v for k, v in self._contacts.items() if term in k or term in v['phone'] or term in v['email'] or term in v['group']}
-
-class ViewWindow(tk.Toplevel):
-    def __init__(self, master, contacts):
-        tk.Toplevel.__init__(self, master)
-        self.title("Contact Details")
-        self.geometry('500x500')
-        self.configure(bg='#fff')
-        if contacts:
-            for name, contact in contacts.items():
-                self.name_label = tk.Label(
-                    self, text=f"Name: {contact['name'].title()}", bg='#fff')
-                self.name_label.pack(pady=5)
-
-                self.phone_label = tk.Label(
-                    self, text=f"Phone: {contact['phone']}", bg='#fff')
-                self.phone_label.pack(pady=5)
-
-                self.email_label = tk.Label(
-                    self, text=f"Email: {contact['email']}", bg='#fff')
-                self.email_label.pack(pady=5)
-
-                self.group_label = tk.Label(
-                    self, text=f"Group: {contact['group'].title()}", bg='#fff')
-                self.group_label.pack(pady=5)
-
-                self.separator = tk.Label(self, text="", bg='#fff')
-                self.separator.pack(pady=5)
-        else:
-            self.error_label = tk.Label(
-                self, text="No contacts found", bg='#fff', fg='red')
-            self.error_label.pack(pady=5)
-
-
-class Application(tk.Tk):
+class MainWindow(QMainWindow):
     def __init__(self, address_book):
-        tk.Tk.__init__(self)
+        super().__init__()
+
         self.address_book = address_book
-        self.title("Address Book")
-        self.geometry('500x500')
-        self.configure(bg='#fff')
-        self.create_widgets()
 
-    def create_widgets(self):
-        self.name_label = tk.Label(
-            self, text="Name (Case Insensitive)", bg='#fff')
-        self.name_label.pack(pady=(20, 0))
-        self.name_entry = tk.Entry(self)
-        self.name_entry.pack(pady=5)
+        self.setWindowTitle("Stylish Contact Manager")
+        self.setWindowIcon(QIcon("icon.png"))
+        self.setGeometry(200, 200, 400, 300)
 
-        self.phone_label = tk.Label(self, text="Phone", bg='#fff')
-        self.phone_label.pack(pady=5)
-        self.phone_entry = tk.Entry(self)
-        self.phone_entry.pack(pady=5)
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #444444;
+                color: #BBBBBB;
+                font-family: 'Verdana';
+            }
+            QLabel {
+                font-size: 20px;
+            }
+            QLineEdit {
+                background-color: #333333;
+                color: #BBBBBB;
+                border: 2px solid #BBBBBB;
+                border-radius: 10px;
+                padding: 5px;
+            }
+            QPushButton {
+                background-color: #DD5555;
+                color: #FFFFFF;
+                border: none;
+                border-radius: 10px;
+                padding: 10px;
+                min-width: 100px;
+            }
+            QPushButton:hover {
+                background-color: #EE6666;
+            }
+            QPushButton:pressed {
+                background-color: #CC4444;
+            }
+        """)
 
-        self.email_label = tk.Label(self, text="Email", bg='#fff')
-        self.email_label.pack(pady=5)
-        self.email_entry = tk.Entry(self)
-        self.email_entry.pack(pady=5)
+        self.main_widget = QWidget(self)
+        self.setCentralWidget(self.main_widget)
 
-        self.group_label = tk.Label(self, text="Group", bg='#fff')
-        self.group_label.pack(pady=5)
-        self.group_entry = tk.Entry(self)
-        self.group_entry.pack(pady=5)
+        self.layout = QVBoxLayout(self.main_widget)
 
-        self.add_button = tk.Button(
-            self, text="Add Contact", command=self.add_contact, bg='#4CAF50', fg='white')
-        self.add_button.pack(pady=5)
+        self.name_entry = QLineEdit()
+        self.layout.addWidget(QLabel("Name"))
+        self.layout.addWidget(self.name_entry)
 
-        self.view_button = tk.Button(
-            self, text="View Contact", command=self.view_contact, bg='#2196F3', fg='white')
-        self.view_button.pack(pady=5)
+        self.add_button = QPushButton("Add Contact")
+        self.add_button.clicked.connect(self.add_contact)
+        self.layout.addWidget(self.add_button)
 
-        self.edit_button = tk.Button(
-            self, text="Edit Contact", command=self.edit_contact, bg='#FFC107', fg='white')
-        self.edit_button.pack(pady=5)
+        self.view_button = QPushButton("View Contact")
+        self.view_button.clicked.connect(self.view_contact)
+        self.layout.addWidget(self.view_button)
 
-        self.delete_button = tk.Button(
-            self, text="Delete Contact", command=self.delete_contact, bg='#f44336', fg='white')
-        self.delete_button.pack(pady=5)
+        self.edit_button = QPushButton("Edit Contact")
+        self.edit_button.clicked.connect(self.edit_contact)
+        self.layout.addWidget(self.edit_button)
 
-        self.search_button = tk.Button(
-            self, text="Search Contacts", command=self.search_contacts, bg='#9C27B0', fg='white')
-        self.search_button.pack(pady=5)
+        self.delete_button = QPushButton("Delete Contact")
+        self.delete_button.clicked.connect(self.delete_contact)
+        self.layout.addWidget(self.delete_button)
 
     def add_contact(self):
-        name = self.name_entry.get()
-        phone = self.phone_entry.get()
-        email = self.email_entry.get()
-        group = self.group_entry.get()
-        if self.address_book.add(name, phone, email, group):
-            messagebox.showinfo("Success", "Contact added successfully")
-        else:
-            messagebox.showinfo("Failure", "Contact already exists")
+        dialog = ContactDialog(self)
+        result = dialog.exec()
+
+        if result == QDialog.DialogCode.Accepted:
+            name, phone, email = dialog.get_values()
+            if self.address_book.add(name, phone, email):
+                QMessageBox.information(self, "Success", f"Contact {name} added successfully")
+            else:
+                QMessageBox.warning(self, "Error", f"Contact {name} already exists")
 
     def view_contact(self):
-        name = self.name_entry.get()
+        name = self.name_entry.text()
         contact = self.address_book.view(name)
-        ViewWindow(self, {name: contact})
+
+        if contact:
+            dialog = ContactDialog(self, contact['name'], contact['phone'], contact['email'])
+            dialog.exec()
+        else:
+            QMessageBox.warning(self, "Error", f"No contact named {name}")
 
     def edit_contact(self):
-        name = self.name_entry.get()
-        phone = self.phone_entry.get()
-        email = self.email_entry.get()
-        group = self.group_entry.get()
-        if self.address_book.edit(name, phone, email, group):
-            messagebox.showinfo("Success", "Contact edited successfully")
+        name = self.name_entry.text()
+        contact = self.address_book.view(name)
+
+        if contact:
+            dialog = ContactDialog(self, contact['name'], contact['phone'], contact['email'])
+            result = dialog.exec()
+
+            if result == QDialog.DialogCode.Accepted:
+                name, phone, email = dialog.get_values()
+                if self.address_book.edit(name, phone, email):
+                    QMessageBox.information(self, "Success", f"Contact {name} edited successfully")
+                else:
+                    QMessageBox.warning(self, "Error", f"Failed to edit contact {name}")
         else:
-            messagebox.showinfo("Failure", "Contact does not exist")
+            QMessageBox.warning(self, "Error", f"No contact named {name}")
 
     def delete_contact(self):
-        name = self.name_entry.get()
+        name = self.name_entry.text()
         if self.address_book.delete(name):
-            messagebox.showinfo("Success", "Contact deleted successfully")
+            QMessageBox.information(self, "Success", f"Contact {name} deleted successfully")
         else:
-            messagebox.showinfo("Failure", "Contact does not exist")
-
-    def search_contacts(self):
-        term = self.name_entry.get()
-        results = self.address_book.search(term)
-        ViewWindow(self, results)
+            QMessageBox.warning(self, "Error", f"No contact named {name}")
 
 
 if __name__ == "__main__":
+    app = QApplication(sys.argv)
     address_book = AddressBook()
-    app = Application(address_book)
-    app.mainloop()
+    window = MainWindow(address_book)
+    window.show()
+    sys.exit(app.exec())
