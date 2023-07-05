@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Stylish Contact Manager")
         self.setWindowIcon(QIcon("icon.png"))
-        self.setGeometry(200, 200, 400, 300)
+        self.setGeometry(200, 200, 500, 400)
 
         self.setStyleSheet("""
             QWidget {
@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
                 padding: 5px;
             }
             QPushButton {
-                background-color: #DD5555;
+                background-color: #5588DD;
                 color: #FFFFFF;
                 border: none;
                 border-radius: 10px;
@@ -125,10 +125,10 @@ class MainWindow(QMainWindow):
                 min-width: 100px;
             }
             QPushButton:hover {
-                background-color: #EE6666;
+                background-color: #6699EE;
             }
             QPushButton:pressed {
-                background-color: #CC4444;
+                background-color: #4477CC;
             }
         """)
 
@@ -137,9 +137,19 @@ class MainWindow(QMainWindow):
 
         self.layout = QVBoxLayout(self.main_widget)
 
+        self.layout.addWidget(QLabel("Contact Details"))
+
         self.name_entry = QLineEdit()
         self.layout.addWidget(QLabel("Name"))
         self.layout.addWidget(self.name_entry)
+
+        self.phone_entry = QLineEdit()
+        self.layout.addWidget(QLabel("Phone"))
+        self.layout.addWidget(self.phone_entry)
+
+        self.email_entry = QLineEdit()
+        self.layout.addWidget(QLabel("Email"))
+        self.layout.addWidget(self.email_entry)
 
         self.add_button = QPushButton("Add Contact")
         self.add_button.clicked.connect(self.add_contact)
