@@ -6,13 +6,16 @@ This Contact Management System is a Python-based application designed with PyQt6
 
 Main
 
+
 ![Add Function](./img/Add.png)
 
 Add Function
 
+
 ![Delete Function](./img/Delete.png)
 
 Delete Function
+
 
 ## Features
 
