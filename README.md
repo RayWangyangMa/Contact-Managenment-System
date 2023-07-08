@@ -2,6 +2,15 @@
 
 This Contact Management System is a Python-based application designed with PyQt6 for a seamless user interface and JSON for robust, local data storage. Manage your contacts with efficiency and ease directly on your local system.
 
+![Main Page](./img/Main.png)
+Mai
+
+![Add Function](./img/Add.png)
+Add Function
+
+![Delete Function](./img/Delete.png)
+Delete Function
+
 ## Features
 
 1. **Add Contact:** Permits you to create a new contact with details such as Name, Phone Number, and Email.
